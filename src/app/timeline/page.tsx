@@ -7,20 +7,20 @@ const S = {
   bodyText: { fontFamily: "var(--font-body)", color: "var(--color-sepia)", lineHeight: 1.75 },
 };
 
-type TimelineEntry = { year: string; event: string; tag: "Abolition" | "Native Rights" | "Both" };
+type TimelineEntry = { year: string; event: string; tag: "Abolition" | "Native Rights" };
 
 const entries: TimelineEntry[] = [
   { year: "~10,000 BCE", event: "Indigenous peoples establish complex, sovereign societies across the North American continent.", tag: "Native Rights" },
   { year: "1492", event: "European contact begins. Disease and colonization initiate catastrophic population collapse among Indigenous nations.", tag: "Native Rights" },
   { year: "1619", event: "First enslaved Africans arrive in English North America at Point Comfort, Virginia.", tag: "Abolition" },
-  { year: "1675–1676", event: "Bacon's Rebellion leads colonial planters to harden racial slavery.", tag: "Both" },
+  { year: "1675–1676", event: "Bacon's Rebellion leads colonial planters to harden racial slavery.", tag: "Abolition" },
   { year: "1688", event: "Germantown Quaker Petition — the first formal protest against slavery in the American colonies.", tag: "Abolition" },
   { year: "1739", event: "Stono Rebellion — one of the largest slave uprisings in colonial America.", tag: "Abolition" },
-  { year: "1775–1783", event: "American Revolution. The Declaration of Independence asserts that 'all men are created equal' — a promise not extended to the enslaved or to Native nations.", tag: "Both" },
+  { year: "1775–1783", event: "American Revolution. The Declaration of Independence asserts that 'all men are created equal' — a promise not extended to the enslaved or to Native nations.", tag: "Abolition" },
   { year: "1808", event: "International slave trade officially banned in the United States. Domestic trade continues and expands.", tag: "Abolition" },
   { year: "1820", event: "Missouri Compromise — Missouri admitted as a slave state, Maine as free; slavery barred north of 36°30′ in the Louisiana Territory.", tag: "Abolition" },
   { year: "1827", event: "Cherokee Nation adopts a written constitution. The Cherokee Phoenix newspaper begins publication.", tag: "Native Rights" },
-  { year: "1830", event: "Indian Removal Act signed by President Jackson. William Lloyd Garrison launches The Liberator.", tag: "Both" },
+  { year: "1830", event: "Indian Removal Act signed by President Jackson. William Lloyd Garrison launches The Liberator.", tag: "Native Rights" },
   { year: "1831", event: "Nat Turner's Rebellion in Virginia — the deadliest slave uprising in American history.", tag: "Abolition" },
   { year: "1832", event: "Worcester v. Georgia — Supreme Court rules in favor of Cherokee sovereignty. Jackson defies the ruling.", tag: "Native Rights" },
   { year: "1838–1839", event: "Trail of Tears. Approximately 4,000 Cherokee die during the forced removal westward.", tag: "Native Rights" },
@@ -40,7 +40,7 @@ const entries: TimelineEntry[] = [
   { year: "1865–1866", event: "Southern states pass Black Codes — laws restricting movement, labor, and rights of freedpeople, effectively reimposing conditions of servitude.", tag: "Abolition" },
   { year: "1866", event: "Fourteenth Amendment proposed — defines citizenship and guarantees equal protection of the laws to all persons born or naturalized in the United States.", tag: "Abolition" },
   { year: "1867", event: "Reconstruction Acts divide the South into military districts, requiring new state constitutions and Black male suffrage as conditions for readmission.", tag: "Abolition" },
-  { year: "1868", event: "Fourteenth Amendment ratified. Second Fort Laramie Treaty guarantees the Black Hills to the Lakota — violated within six years when gold is discovered.", tag: "Both" },
+  { year: "1868", event: "Fourteenth Amendment ratified. Second Fort Laramie Treaty guarantees the Black Hills to the Lakota — violated within six years when gold is discovered.", tag: "Native Rights" },
   { year: "1868–1871", event: "Ku Klux Klan terror campaign against Black voters, officeholders, and Republican leaders across the South. Congress passes the Enforcement Acts to combat it.", tag: "Abolition" },
   { year: "1870", event: "Fifteenth Amendment ratified — prohibits denial of the vote on grounds of race, color, or previous condition of servitude.", tag: "Abolition" },
   { year: "1876–1877", event: "Disputed presidential election settled by the Compromise of 1877 — Hayes becomes president; federal troops are withdrawn from the South, ending Reconstruction and leaving freedpeople without protection.", tag: "Abolition" },
@@ -50,13 +50,6 @@ const entries: TimelineEntry[] = [
 const tagColor: Record<TimelineEntry["tag"], string> = {
   "Abolition": "var(--color-rust)",
   "Native Rights": "var(--color-sage)",
-  "Both": "var(--color-brass)",
-};
-
-const tagLabel: Record<TimelineEntry["tag"], string> = {
-  "Abolition": "Abolition",
-  "Native Rights": "Native Rights",
-  "Both": "Both Movements",
 };
 
 export default function TimelinePage() {
@@ -65,7 +58,7 @@ export default function TimelinePage() {
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [filter, setFilter] = useState<"All" | TimelineEntry["tag"]>("All");
 
-  const filtered = filter === "All" ? entries : entries.filter((e) => e.tag === filter || e.tag === "Both");
+  const filtered = filter === "All" ? entries : entries.filter((e) => e.tag === filter);
 
   const go = useCallback((idx: number, dir: "next" | "prev") => {
     if (animating) return;
@@ -80,10 +73,8 @@ export default function TimelinePage() {
   const prev = () => go(current === 0 ? filtered.length - 1 : current - 1, "prev");
   const next = () => go(current === filtered.length - 1 ? 0 : current + 1, "next");
 
-  // Reset to 0 when filter changes
   useEffect(() => { setCurrent(0); }, [filter]);
 
-  // Keyboard nav
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
@@ -108,10 +99,10 @@ export default function TimelinePage() {
 
         {/* Legend */}
         <div style={{ display: "flex", gap: "1.5rem", justifyContent: "center", marginTop: "1.5rem", flexWrap: "wrap" }}>
-          {(["Abolition", "Native Rights", "Both"] as const).map((tag) => (
+          {(["Abolition", "Native Rights"] as const).map((tag) => (
             <span key={tag} style={{ display: "flex", alignItems: "center", gap: "0.4rem", ...S.monoLabel, fontSize: "0.58rem", color: "var(--color-sepia)" }}>
               <span style={{ display: "inline-block", width: 10, height: 10, background: tagColor[tag], borderRadius: "50%" }} />
-              {tagLabel[tag]}
+              {tag}
             </span>
           ))}
         </div>
@@ -119,7 +110,7 @@ export default function TimelinePage() {
 
       {/* Filter tabs */}
       <div style={{ display: "flex", justifyContent: "center", gap: "0", marginBottom: "2.5rem", borderBottom: "1px solid var(--color-parchment-dk)", borderTop: "1px solid var(--color-parchment-dk)" }}>
-        {(["All", "Abolition", "Native Rights", "Both"] as const).map((f) => (
+        {(["All", "Abolition", "Native Rights"] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -135,7 +126,7 @@ export default function TimelinePage() {
               transition: "background 0.18s, color 0.18s",
             }}
           >
-            {f === "Both" ? "Both Movements" : f}
+            {f}
           </button>
         ))}
       </div>
@@ -155,14 +146,13 @@ export default function TimelinePage() {
             transition: "opacity 0.22s ease, transform 0.22s ease",
           }}
         >
-          {/* Ornamental corner */}
           <span aria-hidden style={{ position: "absolute", top: 10, left: 14, fontFamily: "var(--font-display)", fontSize: "1.2rem", color: "var(--color-brass)", opacity: 0.4, lineHeight: 1 }}>❧</span>
           <span aria-hidden style={{ position: "absolute", top: 10, right: 14, fontFamily: "var(--font-display)", fontSize: "1.2rem", color: "var(--color-brass)", opacity: 0.4, lineHeight: 1, transform: "scaleX(-1)", display: "inline-block" }}>❧</span>
 
           {/* Tag chip */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
             <span style={{ width: 10, height: 10, borderRadius: "50%", background: tagColor[entry.tag], display: "inline-block", flexShrink: 0 }} />
-            <span style={{ ...S.monoLabel, fontSize: "0.56rem", color: tagColor[entry.tag] }}>{tagLabel[entry.tag]}</span>
+            <span style={{ ...S.monoLabel, fontSize: "0.56rem", color: tagColor[entry.tag] }}>{entry.tag}</span>
           </div>
 
           {/* Year */}
@@ -183,78 +173,28 @@ export default function TimelinePage() {
 
         {/* Nav buttons */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.25rem" }}>
-          <button
-            onClick={prev}
-            aria-label="Previous"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.6rem",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              background: "none",
-              border: "1px solid var(--color-walnut)",
-              color: "var(--color-walnut)",
-              padding: "0.5rem 1.25rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
+          <button onClick={prev} aria-label="Previous" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "none", border: "1px solid var(--color-walnut)", color: "var(--color-walnut)", padding: "0.5rem 1.25rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             ← Prev
           </button>
 
           {/* Dot scrubber */}
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", justifyContent: "center", maxWidth: "340px" }}>
             {filtered.map((e, i) => (
-              <button
-                key={i}
-                onClick={() => go(i, i > current ? "next" : "prev")}
-                aria-label={`Go to ${e.year}`}
-                style={{
-                  width: i === current ? 10 : 7,
-                  height: i === current ? 10 : 7,
-                  borderRadius: "50%",
-                  background: i === current ? tagColor[filtered[current].tag] : "var(--color-parchment-dk)",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 0,
-                  transition: "all 0.18s",
-                  flexShrink: 0,
-                }}
-              />
+              <button key={i} onClick={() => go(i, i > current ? "next" : "prev")} aria-label={`Go to ${e.year}`} style={{ width: i === current ? 10 : 7, height: i === current ? 10 : 7, borderRadius: "50%", background: i === current ? tagColor[filtered[current].tag] : "var(--color-parchment-dk)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.18s", flexShrink: 0 }} />
             ))}
           </div>
 
-          <button
-            onClick={next}
-            aria-label="Next"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.6rem",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              background: "none",
-              border: "1px solid var(--color-walnut)",
-              color: "var(--color-walnut)",
-              padding: "0.5rem 1.25rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
+          <button onClick={next} aria-label="Next" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "none", border: "1px solid var(--color-walnut)", color: "var(--color-walnut)", padding: "0.5rem 1.25rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             Next →
           </button>
         </div>
 
-        {/* Keyboard hint */}
         <p style={{ ...S.monoLabel, fontSize: "0.5rem", color: "var(--color-sepia)", opacity: 0.45, textAlign: "center", marginTop: "1rem" }}>
           ← → Arrow keys also navigate
         </p>
       </div>
 
-      {/* All-entries mini list below */}
+      {/* All-entries mini list */}
       <div style={{ marginTop: "4rem", borderTop: "2px solid var(--color-walnut)", paddingTop: "2rem" }}>
         <p style={{ ...S.monoLabel, fontSize: "0.58rem", color: "var(--color-brass)", marginBottom: "1.5rem" }}>All Entries — Quick Reference</p>
         <div style={{ display: "flex", flexDirection: "column" }}>
@@ -267,9 +207,9 @@ export default function TimelinePage() {
                 gridTemplateColumns: "96px 12px 1fr",
                 gap: "1rem",
                 padding: "0.75rem 0",
-                borderBottom: "1px dashed rgba(107,76,48,0.15)",
                 background: i === current ? "rgba(154,112,32,0.06)" : "transparent",
                 border: "none",
+                borderBottom: "1px dashed rgba(107,76,48,0.15)",
                 cursor: "pointer",
                 textAlign: "left",
                 width: "100%",
