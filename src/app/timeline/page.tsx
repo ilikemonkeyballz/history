@@ -270,7 +270,6 @@ export default function TimelinePage() {
                 borderBottom: "1px dashed rgba(107,76,48,0.15)",
                 background: i === current ? "rgba(154,112,32,0.06)" : "transparent",
                 border: "none",
-                borderBottom: "1px dashed rgba(107,76,48,0.15)",
                 cursor: "pointer",
                 textAlign: "left",
                 width: "100%",
